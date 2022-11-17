@@ -5,7 +5,6 @@ import random
 
 
 class ClassUniformBatchSampler(Sampler):
-    """Returns the classes in order, but with the entries of each class shuffled."""
     def __init__(self, dataset, P, K, start_indices, num_examples):
         """Returns batches of size P x K where P is the number of classes per batch and K is the number of samples per class. Assumes dataset has classes in order and the class lables are from 0 to
         MAX_LABEL. Assumes also that the dataset items with label i are precisely the elements with
@@ -94,7 +93,7 @@ class ClassUniformBatchSampler(Sampler):
                     curr_batch = []
                     num_items_in_batch = 0
                     
-        #there are fewer than PxK elements remaining    
+        #there are fewer than PxK elements remaining so we ignore them   
         
         return
     
