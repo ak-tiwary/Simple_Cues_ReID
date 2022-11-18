@@ -46,7 +46,8 @@ class RandomErase(nn.Module):
                 x_e, y_e = random.randrange(0, W-1), random.randrange(0,H-1)
             
             #want channel-wise mean
-            img[:, y_e : y_e + h_e, x_e : x_e + w_e] = torch.mean(img.view(img.shape[0], -1), dim=1, keepdim=True).unsqueeze(-1)
+            img[:, y_e : y_e + h_e, x_e : x_e + w_e] = torch.mean(img.view(img.shape[0], -1), 
+                                                                  dim=1, keepdim=True).unsqueeze(-1)
             
             return img
         else:
