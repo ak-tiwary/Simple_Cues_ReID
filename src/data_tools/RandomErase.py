@@ -12,7 +12,7 @@ import random
 
 
 class RandomErase(nn.Module):
-    def __init__(self, p_erase=0.5, aspect_ratio_range=(0.3,3.33), area_range=(0.02,0.25)):
+    def __init__(self, p_erase=0.5, aspect_ratio_range=(0.3,3.33), area_range=(0.02,0.4)):
         """The a portion of the image is randomly erased with probability p_erase. 
         The aspect ratio of the erased rectangle lies between the range provided by 
         aspect_ratio_range. The ratio of the area of the rectangle to the area of the
