@@ -5,11 +5,11 @@ import random
 
 
 class ClassUniformBatchSampler(Sampler):
-    def __init__(self, dataset, P, K, start_indices, num_examples):
+    def __init__(self, dataset, P, K, start_indices, num_examples, num_classes):
         """Returns batches of size P x K where P is the number of classes per batch and K is the number of samples per class. Assumes dataset has classes in order and the class lables are from 0 to
         MAX_LABEL. Assumes also that the dataset items with label i are precisely the elements with
         indices start_indices[i] to start_indices[i] + num_examples[i]"""
-        self.num_classes = len(dataset)
+        self.num_classes = num_classes
         self.start_indices = start_indices
         self.num_examples = num_examples 
         self.dataset = dataset
