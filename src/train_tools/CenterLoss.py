@@ -6,7 +6,9 @@ import torch.nn as nn
 class CenterLoss(nn.Module):
     def __init__(self, num_classes, embedding_dim):
         """Assume that the classes are 0 to num_classes-1 as usual."""
-        self.centers = nn.Parameter(torch.empty((num_classes, embedding_dim), dtype=torch.float))
+        self.centers = nn.Parameter(torch.empty((num_classes, 
+                                                 embedding_dim), 
+                                                dtype=torch.float))
         nn.init.xavier_normal_(self.centers)
         self.mse = nn.MSELoss()
         
