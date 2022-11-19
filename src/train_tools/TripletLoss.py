@@ -8,7 +8,7 @@ def sq_l2_dist(x,y):
     
 
 class TripletLoss(nn.Module):
-    def __init__(self, margin, alpha=0.3): #alpha from Bag of Tricks paper
+    def __init__(self, alpha=0.3): #alpha from Bag of Tricks paper
         super().__init__()
         self.alpha = alpha
         

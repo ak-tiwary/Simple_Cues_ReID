@@ -47,7 +47,10 @@ class Net(nn.Module):
         
     def forward(self, x):
         """During test time returns features and output of fc layers.
-        During inference time returns output after batch normalization."""
+        During inference time returns output after batch normalization.
+        
+        Potential minor issue: When in validation mode should the model
+        act as if in inference mode and return batch normalized outputs?"""
         
         features = self.backbone(x)
         
