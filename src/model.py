@@ -45,12 +45,17 @@ class Net(nn.Module):
                             out_features=num_classes,
                             bias=False)
         
+        self.imagenet_mean = torch.tensor([0.485, 0.456,0.406]).reshape((1,-1,1,1))
+        self.imagenet_sd = torch.tensor([0.229, 0.224, 0.225]).reshape((1,-1,1,1))
+        
     def forward(self, x):
         """During test time returns features and output of fc layers.
         During inference time returns output after batch normalization.
         
         Potential minor issue: When in validation mode should the model
         act as if in inference mode and return batch normalized outputs?"""
+        #normalize
+        x = (x - self.imagenet_mean) / self.imagenet_sd
         
         features = self.backbone(x)
         
