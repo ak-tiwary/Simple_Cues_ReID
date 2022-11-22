@@ -4,6 +4,8 @@ from os.path import basename as bn
 from glob import glob
 from collections import defaultdict
 from PIL import Image
+
+import torch
 from torch.utils.data import DataLoader, Dataset
 
 
@@ -56,7 +58,8 @@ class Market1501_Query(Dataset):
         
         self.pids, self.camids = zip(*[(int(m.group(1)), int(m.group(2)))
                                         for m in matches])
-                
+        #self.pids = torch.tensor(self.pids)
+       # self.camids = torch.tensor(self.camids)
         
     def __getitem__(self, idx):
         img = Image.open(self.filenames[idx]).convert("RGB")
@@ -66,12 +69,12 @@ class Market1501_Query(Dataset):
         if self.transform is not None:
             img = self.transform(img)
             
-        img_info = {"img" : img, "camid" : camid, "pid" : pid}
+        #img_info = {"img" : img, "camid" : camid, "pid" : pid}
             
         if self.target_transform is not None:
-            img_info = self.target_transform(img_info)
+            pid, camid = self.target_transform(pid, camid)
             
-        return img_info
+        return img, pid, camid
         
         
     def __len__(self):
@@ -120,12 +123,12 @@ class Market1501_Test(Dataset):
         if self.transform is not None:
             img = self.transform(img)
             
-        img_info = {"img" : img, "camid" : camid, "pid" : pid}
+        #img_info = {"img" : img, "camid" : camid, "pid" : pid}
             
         if self.target_transform is not None:
-            img_info = self.target_transform(img_info)
+            pid, camid = self.target_transform(pid, camid)
             
-        return img_info
+        return img, pid, camid
         
         
     def __len__(self):
