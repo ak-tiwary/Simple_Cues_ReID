@@ -8,7 +8,6 @@ from torch.utils.data import Dataset
 class Market1501(Dataset):
     def __init__(self, root, train=True,
                  transform=None, target_transform=None):
-        """Treats the test and query folders as training and the train folder as test."""
         self.are_we_training = train
         self.root = root
         self.label_to_start_stop_idxs = defaultdict(list)
@@ -20,7 +19,7 @@ class Market1501(Dataset):
         self.transform = transform
         self.target_transform = target_transform
         
-        #NOTE TEST, TRAIN here are not the same as our val/train.
+        
         self._TEST_FOLDER = os.path.join(self.root, "bounding_box_test")
         self._QUERY_FOLDER = os.path.join(self.root, "query")
         self._TRAIN_FOLDER = os.path.join(self.root, "bounding_box_train")
