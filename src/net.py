@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torchvision
 from loguru import logger
 
@@ -30,8 +31,11 @@ def get_backbone():
     
 class Net(nn.Module):
     """The full Siamese network with BNNeck."""
-    def __init__(self, num_classes, backbone=get_backbone(), device=torch.device("cuda")):
-        """num_classes is the number of identities being classified."""
+    def __init__(self, num_classes, backbone=get_backbone(), device=torch.device("cuda"),
+                 normalize=False):
+        """num_classes is the number of identities being classified.
+        
+        If the normalize flag is true, will normalize feature vectors during inference."""
         #gives features, used to calculate triplet and center loss
         super().__init__()
         self.backbone = backbone.to(device) 
@@ -49,6 +53,8 @@ class Net(nn.Module):
         self.imagenet_mean = torch.tensor([0.485, 0.456,0.406]).reshape((1,-1,1,1)).to(device)
         self.imagenet_sd = torch.tensor([0.229, 0.224, 0.225]).reshape((1,-1,1,1)).to(device)
         
+        self.normalize = normalize
+        
     def forward(self, x):
         """During test time returns features and output of fc layers.
         During inference time returns output after batch normalization.
@@ -64,5 +70,8 @@ class Net(nn.Module):
             class_probs = self.fc(self.batch_norm(features))
             return class_probs, features 
         else: #inference mode
-            return self.batch_norm(features)
+            features = self.batch_norm(features)
+            if self.normalize:
+                features = F.normalize(features, dim=1)
+            return features
 

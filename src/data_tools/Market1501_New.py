@@ -133,13 +133,68 @@ class Market1501_Test(Dataset):
 
 
 #for this we can just use the older one
-class Market1501_Train(Dataset):
-    def __init__(self, root, 
-                 transform, target_transform):
-        raise NotImplementedError()
 
+class Market1501_Train(Dataset):
+    def __init__(self, root, transform=None, target_transform=None):
+        self.root = root
+        self.label_to_start_stop_idxs = defaultdict(list)
+       # self.idx_to_label = defaultdict(lambda : -1)
+        #self.labels_to_idxs = defaultdict(list)
+        self.labels = []
+        self.idx_to_label = {}
+        
+        self.transform = transform
+        self.target_transform = target_transform
         
         
+        #self._TEST_FOLDER = os.path.join(self.root, "bounding_box_test")
+        #self._QUERY_FOLDER = os.path.join(self.root, "query")
+        self._TRAIN_FOLDER = os.path.join(self.root, "bounding_box_train")
+        
+       
+        self.filenames = []
+        
+        #ignore thumbs.db
+        train_filenames = os.listdir(self._TRAIN_FOLDER)[:-1]
+        
+        latest_label_seen = 2
+        self.label_to_start_stop_idxs[latest_label_seen].append(0)
+        self.labels = [2]
+        for i,filename in enumerate(train_filenames):
+            full_filename = os.path.join(self._TRAIN_FOLDER, filename)
+            self.filenames.append(full_filename)
+            label = int(filename[:4])
+            self.idx_to_label[i] = label
+            if label > latest_label_seen:
+                self.label_to_start_stop_idxs[latest_label_seen].append(i-1)
+                latest_label_seen = label
+                self.label_to_start_stop_idxs[label] = [i]
+                self.labels.append(label)
+        #boundary case: the last label won't have an end point
+        self.label_to_start_stop_idxs[latest_label_seen].append(len(train_filenames) - 1)
+            
+        #self.labels_inv[self.labels[i]] = i
+        self.labels_inv = {x : i for (i,x) in enumerate(self.labels)}
+                    
+    
+    def __getitem__(self, idx):
+        #we will get the image from self.filenames[i]
+        img = Image.open(self.filenames[idx]).convert("RGB")
+        
+        #use labels_inv to get labels between 0 and N-1
+        #instead of 1, 4, 7, ...
+        label = self.labels_inv[self.idx_to_label[idx]]
+        
+        if self.transform is not None:
+            img = self.transform(img)
+            
+        if self.target_transform is not None:
+            label = self.target_transform(label)
+        
+        return img, label
+    
+    def __len__(self):
+        return len(self.filenames)
         
         
         
