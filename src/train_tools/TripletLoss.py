@@ -15,7 +15,12 @@ class TripletLoss(nn.Module):
     
     def forward(self, a, p, n):
         """a,p,n are feature matrices of shape NxD"""
+        assert len(a.shape) == 2
         dist_positive = sq_l2_dist(a,p)
         dist_negative = sq_l2_dist(a,n)
         
-        return F.relu(dist_positive - dist_negative + self.alpha).mean()
+        loss_vector = F.relu(dist_positive - dist_negative + self.alpha)
+        num_nonzero = torch.count_nonzero(loss_vector) + 0.000001 #for numeric stability
+        
+        # from bag of tricks paper, we want to focus on harder cases. 
+        return loss_vector.sum() / num_nonzero

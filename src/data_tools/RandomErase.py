@@ -8,7 +8,7 @@ import torchvision.transforms as T
 
 
 import random
-
+import math
 
 
 class RandomErase(nn.Module):
@@ -25,6 +25,7 @@ class RandomErase(nn.Module):
         self.a1, self.a2 = area_range
         
     def forward(self, img):
+        assert len(img.shape) == 3
         C, H, W = img.shape
         
         
@@ -36,18 +37,31 @@ class RandomErase(nn.Module):
             S_e = S * random.uniform(self.a1, self.a2)
             
             #r = w/h, S = w*h
-            w_e = np.sqrt(r_e * S_e)
+            w_e = math.sqrt(r_e * S_e)
             h_e = w_e / r_e
             
             w_e, h_e = int(w_e), int(h_e)
-            x_e, y_e = random.randrange(0, W-1), random.randrange(0,H-1)
+            #X goes from 0 to W-1
+            #Y goes from 0 to H-1
             
-            while (x_e + w_e >= W) or (y_e + h_e >= H):
-                x_e, y_e = random.randrange(0, W-1), random.randrange(0,H-1)
             
-            #want channel-wise mean
-            img[:, y_e : y_e + h_e, x_e : x_e + w_e] = torch.mean(img.view(img.shape[0], -1), 
-                                                                  dim=1, keepdim=True).unsqueeze(-1)
+            #we want no biasing so we want to randomly pick the center. So we require
+            # x_e >= w_e / 2, y_e >= h_e / 2
+            # and x_e + w_e / 2 <= W-1, y_e + h_e / 2 <= H-1
+            # so ceil(w_e / 2) <= x_e <= floor(W-1 - w_e/2)
+            x_e = random.randrange(math.ceil(w_e / 2), math.floor(W - (w_e / 2) - 1))
+            y_e = random.randrange(math.ceil(h_e / 2), math.floor(H - (h_e / 2) - 1))
+            
+            
+            x_top_left = math.floor(x_e - (w_e / 2))
+            y_top_left = math.ceil(y_e - (h_e / 2))
+            
+            
+            
+            #just set the box to grey
+            grey = torch.tensor([122, 122, 122]).reshape((-1,1,1))
+            img[:, y_top_left : y_top_left + h_e, x_top_left : x_top_left + w_e] = grey
+            
             
             return img
         else:

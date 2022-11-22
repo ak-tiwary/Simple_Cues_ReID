@@ -39,7 +39,7 @@ def compute_distance_matrix(features, distance_fn="L2", eps=1e-12):
 
 
 
-def get_triple_indices(distance_matrix, labels):
+def get_triple_indices(distance_matrix, labels, device):
     """Given an NxN distance matrix between and a N label array returns a tensor of length Mx3 with i,j,k being valid triples
     such that for any i, (i,j) is the furthest apart positive example and (i,k) is the closest negative example.
     
@@ -84,18 +84,18 @@ def get_triple_indices(distance_matrix, labels):
     
     
     
-    return torch.stack([torch.arange(N), farthest, closest], dim=1)
+    return torch.stack([torch.arange(N).to(device), farthest, closest], dim=1)
     
 
     
     
-def get_valid_triples(features, labels):
+def get_valid_triples(features, labels, device):
     """Given an Nxd matrix of N features and corresponding N labels, returns f1, f2, f3, each of shape Nxd, giving
     anchors, positives, and negatives."""
     
     dist_matrix = compute_distance_matrix(features)
     
-    indices = get_triple_indices(dist_matrix, labels)
+    indices = get_triple_indices(dist_matrix, labels, device)
     ind1, ind2, ind3 = indices.T
     
     return features[ind1], features[ind2], features[ind3]
