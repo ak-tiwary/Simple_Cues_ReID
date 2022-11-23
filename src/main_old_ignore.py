@@ -40,6 +40,7 @@ STARTING_LR = 0.00035 #from bag of tricks paper
 NUM_EPOCHS = 120
 SHOULD_LOG = False
 
+
 import train_tools.BatchHardMining as BHM
 from tqdm import tqdm
 
@@ -121,6 +122,7 @@ def main():
       device = torch.device("cuda")
       model.to(device)
       
+      model.load_state_dict(torch.load(""))
       
       
       # Create loss functions, optimizer, scheduler, add optimizer to scheduler

@@ -49,9 +49,14 @@ class Net(nn.Module):
         self.fc = nn.Linear(in_features=in_features, 
                             out_features=num_classes,
                             bias=False).to(device)
+        #self.register_buffer("imagenet_mean",torch.tensor([0.485, 0.456,0.406]).reshape((1,-1,1,1)))
+        #self.register_buffer("imagenet_sd", torch.tensor([0.229, 0.224, 0.225]).reshape((1,-1,1,1)))
         
-        self.imagenet_mean = torch.tensor([0.485, 0.456,0.406]).reshape((1,-1,1,1)).to(device)
-        self.imagenet_sd = torch.tensor([0.229, 0.224, 0.225]).reshape((1,-1,1,1)).to(device)
+        # self.imagenet_mean = nn.Parameter(torch.tensor([0.485, 0.456,0.406]).reshape((1,-1,1,1)))
+        # self.imagenet_sd = nn.Parameter(torch.tensor([0.229, 0.224, 0.225]).reshape((1,-1,1,1)))
+        
+        # self.imagenet_mean.requires_grad = False
+        # self.imagenet_sd.requires_grad = False
         
         self.normalize = normalize
         
@@ -62,8 +67,12 @@ class Net(nn.Module):
         Potential minor issue: When in validation mode should the model
         act as if in inference mode and return batch normalized outputs?"""
         #normalize
-        x = (x - self.imagenet_mean) / self.imagenet_sd
+        #x = (x - self.imagenet_mean) / self.imagenet_sd
+        mean = torch.tensor([0.485, 0.456, 0.406]).reshape((1,-1,1,1)).to(x.device)
+        sd = torch.tensor([0.229, 0.224, 0.225]).reshape((1,-1,1,1)).to(x.device)
         
+        x = (x - mean) / sd
+       
         features = self.backbone(x)
         
         if self.training:
